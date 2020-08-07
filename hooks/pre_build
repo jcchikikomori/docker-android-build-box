@@ -2,6 +2,6 @@
 #
 
 # Pull exist image to boost build
-docker pull mingc/android-build-box
+docker pull jccdevbox/android-build-box
 
 docker images
