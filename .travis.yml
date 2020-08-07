@@ -8,7 +8,7 @@ services:
 #
 env:
   # All the env variables need put into a single line.
-  - IMAGE_NAME=jccdevbox/android-build-box SOURCE_BRANCH=$TRAVIS_BRANCH SOURCE_COMMIT=$TRAVIS_COMMIT DOCKER_TAG=latest
+  - IMAGE_NAME=jccdevbox/docker-android-build-box SOURCE_BRANCH=$TRAVIS_BRANCH SOURCE_COMMIT=$TRAVIS_COMMIT DOCKER_TAG=latest
 
 before_install:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
@@ -21,7 +21,7 @@ before_install:
 script:
   # - curl 127.0.0.1:8000
   - docker run -it --rm $IMAGE_NAME flutter --version
-  - docker push jccdevbox/android-build-box:${TRAVIS_COMMIT}
+  - docker push jccdevbox/docker-android-build-box:${TRAVIS_COMMIT}
 
 after_script:
   - ./hooks/post_build
