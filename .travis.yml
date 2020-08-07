@@ -21,6 +21,7 @@ before_install:
 script:
   # - curl 127.0.0.1:8000
   - docker run -it --rm $IMAGE_NAME flutter --version
+  - docker tag jccdevbox/docker-android-build-box:latest jccdevbox/docker-android-build-box:${TRAVIS_COMMIT}
   - docker push jccdevbox/docker-android-build-box:${TRAVIS_COMMIT}
 
 after_script:
