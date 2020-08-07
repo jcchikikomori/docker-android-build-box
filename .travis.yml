@@ -18,7 +18,10 @@ before_install:
   - travis_wait 50 ./hooks/build
 
 script:
+  - curl 127.0.0.1:8000
   - docker run -it --rm $IMAGE_NAME flutter --version
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker push jccdevbox/android-build-box:${TRAVIS_COMMIT}
 
 after_script:
   - ./hooks/post_build
