@@ -20,9 +20,10 @@ before_install:
 
 script:
   - docker run -it --rm $IMAGE_NAME flutter --version
+  - docker tag jccdevbox/docker-android-build-box:latest
+  - docker push jccdevbox/docker-android-build-box:latest
   # - docker tag jccdevbox/docker-android-build-box:latest jccdevbox/docker-android-build-box:${TRAVIS_COMMIT}
   # - docker push jccdevbox/docker-android-build-box:${TRAVIS_COMMIT}
-  - docker push jccdevbox/docker-android-build-box:latest
 
 after_script:
   - ./hooks/post_build
