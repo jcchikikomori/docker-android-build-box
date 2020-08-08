@@ -1,7 +1,7 @@
 # Docker Android Build Box
 
-[![docker icon](https://dockeri.co/image/jccdevbox/docker-android-build-box/)
-[![Build Status](https://travis-ci.org/jccdevbox/docker-android-build-box.svg?branch=master)](https://travis-ci.org/jccdevbox/docker-android-build-box)
+![docker icon](https://dockeri.co/image/jccdevbox/docker-android-build-box/)
+[![Build Status](https://travis-ci.com/jcchikikomori/docker-android-build-box.svg?branch=develop)](https://travis-ci.com/jcchikikomori/docker-android-build-box)
 
 
 ## Introduction
