@@ -40,7 +40,7 @@ ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 ENV ANDROID_SDK_HOME="$ANDROID_HOME"
 ENV ANDROID_NDK_HOME="$ANDROID_NDK/android-ndk-$ANDROID_NDK_VERSION"
 
-ENV PATH="$PATH:$ANDROID_SDK_HOME/emulator:$ANDROID_SDK_HOME/tools/bin:$ANDROID_SDK_HOME/tools:$ANDROID_SDK_HOME/platform-tools:$ANDROID_NDK:$FLUTTER_HOME/bin:$FLUTTER_HOME/bin/cache/dart-sdk/bin"
+ENV PATH="$PATH:$ANDROID_SDK_HOME/emulator:$ANDROID_SDK_HOME/tools/bin:$ANDROID_SDK_HOME/tools:$ANDROID_SDK_HOME/platform-tools:$ANDROID_NDK:$FLUTTER_HOME/bin:$FLUTTER_HOME/bin/cache/dart-sdk/bin:/usr/local/ssl/bin"
 
 WORKDIR /tmp
 
@@ -51,6 +51,7 @@ RUN apt-get update -qq > /dev/null && \
     apt-get install -qq --no-install-recommends \
     autoconf \
     build-essential \
+    checkinstall \
     curl \
     file \
     git \
@@ -109,23 +110,14 @@ RUN apt-get update -qq > /dev/null && \
     npm cache clean --force > /dev/null && \
     rm -rf /tmp/* /var/tmp/*
 
-# Install Ruby thru GoRails
-# https://gorails.com/setup/ubuntu/18.04#ruby-rvm
-RUN wget http://ftp.ruby-lang.org/pub/ruby/2.6/ruby-2.6.6.tar.gz > /dev/null && \
-    tar -xzvf ruby-2.6.6.tar.gz > /dev/null && \
-    cd ruby-2.6.6/ && \
-    ./configure > /dev/null && \
-    make > /dev/null && \
-    make install > /dev/null && \
-    ruby -v > /dev/null && \
-    cd ..
+# Install Ruby 2.6
+RUN apt-add-repository -y ppa:brightbox/ruby-ng > /dev/null && \
+    apt-get update > /dev/null && \
+    apt-get install -qq ruby2.6 ruby2.6-dev > /dev/null
 
-# Install Bundler & RubyGems
-RUN gem install bundler > /dev/null && \
-    wget https://rubygems.org/rubygems/rubygems-3.1.4.tgz > /dev/null && \
-    tar -xzvf rubygems-3.1.4.tgz > /dev/null && \
-    cd rubygems-3.1.4/ && \
-    ruby setup.rb --silent > /dev/null
+# Update RubyGems
+RUN gem install rubygems-update > /dev/null && \
+    update_rubygems > /dev/null
 
 # Install Android SDK
 RUN echo "sdk tools ${ANDROID_SDK_TOOLS_VERSION}" && \
