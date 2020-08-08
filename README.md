@@ -33,7 +33,7 @@ It includes the following components:
 * TestNG
 * Python 2, Python 3
 * Node.js, npm, React Native
-* Ruby, RubyGems
+* Ruby (RVM), RubyGems
 * fastlane
 * Kotlin 1.3
 * Flutter 1.17.1

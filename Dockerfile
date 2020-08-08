@@ -1,3 +1,6 @@
+# Based from Ming Chen's Android Build Box
+# https://github.com/mingchen/docker-android-build-box
+
 FROM ubuntu:18.04
 
 ENV ANDROID_HOME="/opt/android-sdk" \
@@ -29,6 +32,9 @@ RUN apt-get clean && \
 ENV DEBIAN_FRONTEND="noninteractive" \
     TERM=dumb \
     DEBIAN_FRONTEND=noninteractive
+
+# https://stackoverflow.com/a/49462622/6413072
+ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 
 # Variables must be references after they are created
 ENV ANDROID_SDK_HOME="$ANDROID_HOME"
@@ -66,7 +72,6 @@ RUN apt-get update -qq > /dev/null && \
     openjdk-8-jdk \
     openssh-client \
     pkg-config \
-    ruby-full \
     software-properties-common \
     tzdata \
     unzip \
@@ -104,6 +109,24 @@ RUN apt-get update -qq > /dev/null && \
     npm cache clean --force > /dev/null && \
     rm -rf /tmp/* /var/tmp/*
 
+# Install Ruby thru GoRails
+# https://gorails.com/setup/ubuntu/18.04#ruby-rvm
+RUN wget http://ftp.ruby-lang.org/pub/ruby/2.6/ruby-2.6.6.tar.gz > /dev/null && \
+    tar -xzvf ruby-2.6.6.tar.gz > /dev/null && \
+    cd ruby-2.6.6/ && \
+    ./configure > /dev/null && \
+    make > /dev/null && \
+    make install > /dev/null && \
+    ruby -v > /dev/null && \
+    cd ..
+
+# Install Bundler & RubyGems
+RUN gem install bundler > /dev/null && \
+    wget https://rubygems.org/rubygems/rubygems-3.1.4.tgz > /dev/null && \
+    tar -xzvf rubygems-3.1.4.tgz > /dev/null && \
+    cd rubygems-3.1.4/ && \
+    ruby setup.rb --silent > /dev/null
+
 # Install Android SDK
 RUN echo "sdk tools ${ANDROID_SDK_TOOLS_VERSION}" && \
     wget --quiet --output-document=sdk-tools.zip \
@@ -112,6 +135,7 @@ RUN echo "sdk tools ${ANDROID_SDK_TOOLS_VERSION}" && \
     unzip -q sdk-tools.zip -d "$ANDROID_HOME" && \
     rm --force sdk-tools.zip
 
+# Install Android NDK
 RUN echo "ndk ${ANDROID_NDK_VERSION}" && \
     wget --quiet --output-document=android-ndk.zip \
     "http://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip" && \
@@ -200,7 +224,7 @@ ENV BUILD_DATE=${BUILD_DATE} \
     DOCKER_TAG=${DOCKER_TAG}
 
 # labels, see http://label-schema.org/
-LABEL maintainer="Ming Chen"
+LABEL maintainer="Ming Chen, John Cyrill Corsanes"
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.name="jccdevbox/android-build-box"
 LABEL org.label-schema.version="${DOCKER_TAG}"
