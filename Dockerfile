@@ -110,15 +110,6 @@ RUN apt-get update -qq > /dev/null && \
     npm cache clean --force > /dev/null && \
     rm -rf /tmp/* /var/tmp/*
 
-# Install Ruby 2.6
-RUN apt-add-repository -y ppa:brightbox/ruby-ng > /dev/null && \
-    apt-get update > /dev/null && \
-    apt-get install -qq ruby2.6 ruby2.6-dev > /dev/null
-
-# Update RubyGems
-RUN gem install rubygems-update > /dev/null && \
-    update_rubygems > /dev/null
-
 # Install Android SDK
 RUN echo "sdk tools ${ANDROID_SDK_TOOLS_VERSION}" && \
     wget --quiet --output-document=sdk-tools.zip \
@@ -192,11 +183,21 @@ RUN mkdir -p /var/lib/jenkins/workspace && \
     chmod 777 /var/lib/jenkins/workspace && \
     chmod 777 $ANDROID_HOME/.android
 
-# Install fastlane with bundler and Gemfile
+# Install Ruby 2.7
+RUN apt-add-repository -y ppa:brightbox/ruby-ng > /dev/null && \
+    apt-get update > /dev/null && \
+    apt-get install -qq ruby2.7 ruby2.7-dev > /dev/null
+
+# Pre-Install fastlane with Gemfile
 ENV BUNDLE_GEMFILE=/tmp/Gemfile
-
 COPY Gemfile /tmp/Gemfile
+COPY fastlane/ /tmp/fastlane
 
+# Update RubyGems
+RUN gem install rubygems-update > /dev/null && \
+    update_rubygems > /dev/null
+
+# Install fastlane with bundler and Gemfile
 RUN echo "fastlane" && \
     gem install bundler --quiet --no-document > /dev/null && \
     mkdir -p /.fastlane && \
@@ -218,9 +219,9 @@ ENV BUILD_DATE=${BUILD_DATE} \
 # labels, see http://label-schema.org/
 LABEL maintainer="Ming Chen, John Cyrill Corsanes"
 LABEL org.label-schema.schema-version="1.0"
-LABEL org.label-schema.name="jccdevbox/android-build-box"
+LABEL org.label-schema.name="jccdevbox/docker-android-build-box"
 LABEL org.label-schema.version="${DOCKER_TAG}"
 LABEL org.label-schema.usage="/README.md"
-LABEL org.label-schema.docker.cmd="docker run --rm -v `pwd`:/project jccdevbox/android-build-box bash -c 'cd /project; ./gradlew build'"
+LABEL org.label-schema.docker.cmd="docker run --rm -v `pwd`:/project jccdevbox/docker-android-build-box bash -c 'cd /project; ./gradlew build'"
 LABEL org.label-schema.build-date="${BUILD_DATE}"
 LABEL org.label-schema.vcs-ref="${SOURCE_COMMIT}@${SOURCE_BRANCH}"
