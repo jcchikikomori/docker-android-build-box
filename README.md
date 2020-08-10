@@ -40,8 +40,8 @@ It includes the following components:
 
 ## Difference between the original?
 
-* Upgraded to latest Ruby 2.6 (planning to migrate to 2.7 soon)
-* Firebase Tools (CI)
+* Upgraded to Ruby 2.7 from a PPA repository
+  (`ppa:brightbox/ruby-ng`)
 * Fastlane
 * Android SDK legacy support:
   * 24

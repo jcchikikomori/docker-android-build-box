@@ -4,6 +4,7 @@
 FROM ubuntu:18.04
 
 ENV ANDROID_HOME="/opt/android-sdk" \
+    ANDROID_SDK_ROOT="/opt/android-sdk" \
     ANDROID_NDK="/opt/android-ndk" \
     FLUTTER_HOME="/opt/flutter" \
     JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
@@ -141,7 +142,11 @@ RUN echo "platforms" && \
     "platforms;android-28" \
     "platforms;android-27" \
     "platforms;android-26" \
-    "platforms;android-25" > /dev/null
+    "platforms;android-25" \
+    "platforms;android-24" \
+    "platforms;android-23" \
+    "platforms;android-22" \
+    "platforms;android-21" > /dev/null
 
 RUN echo "platform tools" && \
     yes | "$ANDROID_HOME"/tools/bin/sdkmanager \
