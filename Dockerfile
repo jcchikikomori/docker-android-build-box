@@ -3,13 +3,17 @@
 
 FROM ubuntu:18.04
 
-ENV ANDROID_HOME="/opt/android-sdk" \
+ENV GRADLE_HOME="/opt/gradle/gradle-6.5.1" \
     ANDROID_SDK_ROOT="/opt/android-sdk" \
+    ANDROID_HOME="/opt/android-sdk" \
     ANDROID_NDK="/opt/android-ndk" \
     FLUTTER_HOME="/opt/flutter" \
     JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
 
 ENV TZ=America/Los_Angeles
+
+# Get the latest version from https://gradle.org/releases/
+ENV GRADLE_VERSION=6.5.1
 
 # Get the latest version from https://developer.android.com/studio/index.html
 ENV ANDROID_SDK_TOOLS_VERSION="4333796"
@@ -41,7 +45,9 @@ ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 ENV ANDROID_SDK_HOME="$ANDROID_HOME"
 ENV ANDROID_NDK_HOME="$ANDROID_NDK/android-ndk-$ANDROID_NDK_VERSION"
 
-ENV PATH="$PATH:$ANDROID_SDK_HOME/emulator:$ANDROID_SDK_HOME/tools/bin:$ANDROID_SDK_HOME/tools:$ANDROID_SDK_HOME/platform-tools:$ANDROID_NDK:$FLUTTER_HOME/bin:$FLUTTER_HOME/bin/cache/dart-sdk/bin:/usr/local/ssl/bin"
+ENV PATH="$PATH:$GRADLE_HOME/bin:/opt/gradlew:$ANDROID_SDK_HOME/emulator:$ANDROID_SDK_HOME/tools/bin:$ANDROID_SDK_HOME/tools:$ANDROID_SDK_HOME/platform-tools:$ANDROID_NDK:$FLUTTER_HOME/bin:$FLUTTER_HOME/bin/cache/dart-sdk/bin:/usr/local/ssl/bin"
+
+ENV LD_LIBRARY_PATH="$ANDROID_SDK_HOME/emulator/lib64:$ANDROID_SDK_HOME/emulator/lib64/qt/lib"
 
 WORKDIR /tmp
 
@@ -110,6 +116,14 @@ RUN apt-get update -qq > /dev/null && \
     react-native-cli > /dev/null && \
     npm cache clean --force > /dev/null && \
     rm -rf /tmp/* /var/tmp/*
+
+# Install Gradle
+RUN wget --quiet --output-document=gradle-${GRADLE_VERSION}-bin.zip \
+    https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -P /tmp && \
+    unzip -q gradle-${GRADLE_VERSION}-bin.zip -d /opt/gradle && \
+    mkdir /opt/gradlew && \
+    /opt/gradle/gradle-${GRADLE_VERSION}/bin/gradle wrapper --gradle-version ${GRADLE_VERSION} --distribution-type all -p /opt/gradlew > /dev/null && \
+    /opt/gradle/gradle-${GRADLE_VERSION}/bin/gradle wrapper -p /opt/gradlew > /dev/null
 
 # Install Android SDK
 RUN echo "sdk tools ${ANDROID_SDK_TOOLS_VERSION}" && \
@@ -211,10 +225,14 @@ RUN echo "fastlane" && \
 
 COPY README.md /README.md
 
-ARG BUILD_DATE=""
-ARG SOURCE_BRANCH=""
+# Emulator
+ADD start.sh /
+RUN chmod +x start.sh
+
+ARG BUILD_DATE="2020-08-10"
+ARG SOURCE_BRANCH="develop"
 ARG SOURCE_COMMIT=""
-ARG DOCKER_TAG=""
+ARG DOCKER_TAG="latest"
 
 ENV BUILD_DATE=${BUILD_DATE} \
     SOURCE_BRANCH=${SOURCE_BRANCH} \
