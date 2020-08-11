@@ -227,7 +227,6 @@ COPY README.md /README.md
 
 # Emulator
 ADD start.sh /
-RUN chmod +x start.sh
 
 ARG BUILD_DATE="2020-08-10"
 ARG SOURCE_BRANCH="develop"
